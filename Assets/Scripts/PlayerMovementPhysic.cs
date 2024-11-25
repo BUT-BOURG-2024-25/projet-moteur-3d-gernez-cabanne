@@ -12,7 +12,7 @@ public class PlayerMovementPhysic : MonoBehaviour
     private float rotationSpeed = 200f;
     [SerializeField]
     private float DashPower = 5f;
-    
+
     private Rigidbody physicsBody;
     private Animator animator;
     private bool isGrounded;
@@ -26,20 +26,18 @@ public class PlayerMovementPhysic : MonoBehaviour
     [SerializeField]
     private Button DashButton;
 
+    public Vector3 moveDir; // Vector3 pour le mouvement en 3D
 
     private void Start()
     {
-        //DashButton.onClick.AddListener(OnDashButtonClicked);
-
         animator = GetComponent<Animator>();
         physicsBody = physicsBody ?? GetComponent<Rigidbody>();
         mainCamera = Camera.main;
-        
 
         InputManager.Instance.RegisterOnDashInput(Dash, true);
     }
 
-    private void OnDestroy() 
+    private void OnDestroy()
     {
         InputManager.Instance.RegisterOnDashInput(Dash, false);
     }
@@ -47,6 +45,8 @@ public class PlayerMovementPhysic : MonoBehaviour
     private void Update()
     {
         Vector3 movementInput = Vector3.zero;
+
+        // Utiliser le joystick ou les entrées clavier (par exemple, les touches WASD ou les flèches)
         if (useJoystick)
         {
             movementInput = new Vector3(UIManager.Instance.Joystick.Direction.x, 0.0f, UIManager.Instance.Joystick.Direction.y);
@@ -55,27 +55,30 @@ public class PlayerMovementPhysic : MonoBehaviour
         {
             movementInput = InputManager.Instance.MovementInput;
         }
-        
+
+        // Récupérer la direction en fonction de la caméra
         Vector3 forward = mainCamera.transform.forward;
-        forward.y = 0;
+        forward.y = 0; // Nous ignorons l'axe Y de la caméra pour éviter une inclinaison
         forward.Normalize();
         Vector3 right = mainCamera.transform.right;
 
-        Vector3 movement = (forward * movementInput.z + right * movementInput.x).normalized;
+        // Définir le mouvement en fonction de l'entrée
+        moveDir = (forward * movementInput.z + right * movementInput.x).normalized;
 
-        float moveSpeed = movement.magnitude;
-        
-        physicsBody.velocity = new Vector3(movement.x * speed, physicsBody.velocity.y, movement.z * speed);
-        
-        animator.SetFloat("walk", moveSpeed);
+        // Déplacer le joueur
+        physicsBody.velocity = new Vector3(moveDir.x * speed, physicsBody.velocity.y, moveDir.z * speed);
 
+        // Animer le joueur
+        animator.SetFloat("walk", moveDir.magnitude);
+
+        // Vérifier si le joueur est au sol
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
         animator.SetBool("isGrounded", isGrounded);
 
-        if (moveSpeed > 0.1f)
+        if (moveDir.magnitude > 0.1f)
         {
-            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed);
+            Quaternion toRotation = Quaternion.LookRotation(moveDir, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -96,5 +99,4 @@ public class PlayerMovementPhysic : MonoBehaviour
             animator.SetTrigger("Dash");
         }
     }
-    
 }
