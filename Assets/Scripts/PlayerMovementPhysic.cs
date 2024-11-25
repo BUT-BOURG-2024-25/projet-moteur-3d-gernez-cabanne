@@ -17,7 +17,6 @@ public class PlayerMovementPhysic : MonoBehaviour
     private Animator animator;
     private bool isGrounded;
     private Camera mainCamera;
-    
 
     private float mouseX;
 
@@ -30,7 +29,7 @@ public class PlayerMovementPhysic : MonoBehaviour
 
     private void Start()
     {
-        DashButton.onClick.AddListener(OnDashButtonClicked);
+        //DashButton.onClick.AddListener(OnDashButtonClicked);
 
         animator = GetComponent<Animator>();
         physicsBody = physicsBody ?? GetComponent<Rigidbody>();
@@ -66,7 +65,9 @@ public class PlayerMovementPhysic : MonoBehaviour
 
         float moveSpeed = movement.magnitude;
         
-        animator.SetFloat("speed", moveSpeed);
+        physicsBody.velocity = new Vector3(movement.x * speed, physicsBody.velocity.y, movement.z * speed);
+        
+        animator.SetFloat("walk", moveSpeed);
 
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
         animator.SetBool("isGrounded", isGrounded);
