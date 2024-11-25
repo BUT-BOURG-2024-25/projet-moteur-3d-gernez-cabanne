@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,13 +11,20 @@ public class PlayerMovementPhysic : MonoBehaviour
     private float rotationSpeed = 200f;
     [SerializeField]
     private float DashPower = 5f;
+    private float dashPower = 10f;
+    [SerializeField]
+    private float dashDuration = 0.2f;
+    [SerializeField]
+    private float dashCooldown = 1f;
+
+    [SerializeField]
+    private GameObject smokePrefab; // Le prefab de fumée
+    [SerializeField]
+    private Transform smokeSpawnPoint; // Point où la fumée sera créée
 
     private Rigidbody physicsBody;
     private Animator animator;
-    private bool isGrounded;
     private Camera mainCamera;
-
-    private float mouseX;
 
     [SerializeField]
     private bool useJoystick = false;
@@ -26,26 +32,32 @@ public class PlayerMovementPhysic : MonoBehaviour
     [SerializeField]
     private Button DashButton;
 
+    private bool isDashing = false;
+    private float lastDashTime;
 
     private void Start()
     {
-        //DashButton.onClick.AddListener(OnDashButtonClicked);
+        if (DashButton != null)
+        {
+            DashButton.onClick.AddListener(PerformDash);
+        }
 
         animator = GetComponent<Animator>();
         physicsBody = physicsBody ?? GetComponent<Rigidbody>();
         mainCamera = Camera.main;
 
-
-        InputManager.Instance.RegisterOnDashInput(Dash, true);
+        InputManager.Instance.RegisterOnDashInput(PerformDash, true);
     }
 
     private void OnDestroy()
     {
-        InputManager.Instance.RegisterOnDashInput(Dash, false);
+        InputManager.Instance.RegisterOnDashInput(PerformDash, false);
     }
 
     private void Update()
     {
+        if (isDashing) return;
+
         Vector3 movementInput = Vector3.zero;
         if (useJoystick)
         {
@@ -69,9 +81,6 @@ public class PlayerMovementPhysic : MonoBehaviour
 
         animator.SetFloat("walk", moveSpeed);
 
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
-        animator.SetBool("isGrounded", isGrounded);
-
         if (moveSpeed > 0.1f)
         {
             Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
@@ -79,22 +88,48 @@ public class PlayerMovementPhysic : MonoBehaviour
         }
     }
 
-    private void Dash(InputAction.CallbackContext callbackContext)
+    private void PerformDash(InputAction.CallbackContext callbackContext)
     {
-        if (isGrounded)
-        {
-            physicsBody.AddForce(Vector3.up * DashPower, ForceMode.Impulse);
-            animator.SetTrigger("Dash");
-        }
+        PerformDash();
     }
 
-    private void OnDashButtonClicked()
+    private void PerformDash()
     {
-        if (isGrounded)
+        if (isDashing || Time.time < lastDashTime + dashCooldown) 
         {
-            physicsBody.AddForce(Vector3.up * DashPower, ForceMode.Impulse);
-            animator.SetTrigger("Dash");
+            Debug.Log("Dash prevented due to conditions");
+            return;
         }
+
+        SpawnSmokeEffect();
+        StartCoroutine(DashCoroutine());
     }
 
+    private IEnumerator DashCoroutine()
+    {
+        isDashing = true;
+        lastDashTime = Time.time;
+
+        Vector3 dashDirection = transform.forward;
+        physicsBody.velocity = dashDirection * dashPower;
+
+        animator.SetTrigger("Dash");
+
+        yield return new WaitForSeconds(dashDuration);
+
+        isDashing = false;
+    }
+
+    private void SpawnSmokeEffect()
+    {
+        if (smokePrefab != null && smokeSpawnPoint != null)
+        {
+            Instantiate(smokePrefab, smokeSpawnPoint.position, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogWarning("Smoke prefab or spawn point is not assigned.");
+        }
+    }
 }
+

@@ -13,7 +13,6 @@ public class InputManager : MonoBehaviour
     private InputActionReference DashAction = null;
     [SerializeField]
     private InputActionReference ClickAction = null;
-    [SerializeField]
 
     
     public static InputManager Instance {get {return _instance;}}
@@ -25,10 +24,16 @@ public class InputManager : MonoBehaviour
 
     public void RegisterOnDashInput(Action<InputAction.CallbackContext> OnDashAction, bool register)
     {
-        if(register)
+        if (register)
+        {
             DashAction.action.performed += OnDashAction;
+            Debug.Log("Dash Action Registered");
+        }
         else
+        {
             DashAction.action.performed -= OnDashAction;
+            Debug.Log("Dash Action Unregistered");
+        }
     }
 
     public void RegisterOnClickInput(Action<InputAction.CallbackContext> OnClickAction, bool register)
@@ -54,7 +59,13 @@ public class InputManager : MonoBehaviour
     {
         Vector2 MoveInput = MovementAction.action.ReadValue<Vector2>();
         MovementInput = new Vector3(MoveInput.x, 0, MoveInput.y);
+
+        if (DashAction.action.triggered)
+        {
+            Debug.Log("Dash input triggered");
+        }
     }
+
 
     private void OnEnable()
     {
