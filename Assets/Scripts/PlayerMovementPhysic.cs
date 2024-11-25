@@ -36,10 +36,10 @@ public class PlayerMovementPhysic : MonoBehaviour
 
     private void Start()
     {
-        if (DashButton != null)
-        {
-            DashButton.onClick.AddListener(PerformDash);
-        }
+        // if (DashButton != null)
+        // {
+        //     DashButton.onClick.AddListener(PerformDash);
+        // }
 
         animator = GetComponent<Animator>();
         physicsBody = physicsBody ?? GetComponent<Rigidbody>();
