@@ -67,7 +67,7 @@ public class PlayerAutoAttack : MonoBehaviour
         animator.SetTrigger("PlayerAttack");
 
         AutoProjectile autoProjectile = projectile.GetComponent<AutoProjectile>();
-        if (autoProjectile != null)
+        if (autoProjectile)
         {
             autoProjectile.SetTarget(target);
         }
