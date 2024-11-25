@@ -26,13 +26,15 @@ public class PlayerMovementPhysic : MonoBehaviour
     [SerializeField]
     private Button DashButton;
 
-    public Vector3 moveDir; // Vector3 pour le mouvement en 3D
 
     private void Start()
     {
+        //DashButton.onClick.AddListener(OnDashButtonClicked);
+
         animator = GetComponent<Animator>();
         physicsBody = physicsBody ?? GetComponent<Rigidbody>();
         mainCamera = Camera.main;
+
 
         InputManager.Instance.RegisterOnDashInput(Dash, true);
     }
@@ -45,8 +47,6 @@ public class PlayerMovementPhysic : MonoBehaviour
     private void Update()
     {
         Vector3 movementInput = Vector3.zero;
-
-        // Utiliser le joystick ou les entrées clavier (par exemple, les touches WASD ou les flèches)
         if (useJoystick)
         {
             movementInput = new Vector3(UIManager.Instance.Joystick.Direction.x, 0.0f, UIManager.Instance.Joystick.Direction.y);
@@ -56,29 +56,26 @@ public class PlayerMovementPhysic : MonoBehaviour
             movementInput = InputManager.Instance.MovementInput;
         }
 
-        // Récupérer la direction en fonction de la caméra
         Vector3 forward = mainCamera.transform.forward;
-        forward.y = 0; // Nous ignorons l'axe Y de la caméra pour éviter une inclinaison
+        forward.y = 0;
         forward.Normalize();
         Vector3 right = mainCamera.transform.right;
 
-        // Définir le mouvement en fonction de l'entrée
-        moveDir = (forward * movementInput.z + right * movementInput.x).normalized;
+        Vector3 movement = (forward * movementInput.z + right * movementInput.x).normalized;
 
-        // Déplacer le joueur
-        physicsBody.velocity = new Vector3(moveDir.x * speed, physicsBody.velocity.y, moveDir.z * speed);
+        float moveSpeed = movement.magnitude;
 
-        // Animer le joueur
-        animator.SetFloat("walk", moveDir.magnitude);
+        physicsBody.velocity = new Vector3(movement.x * speed, physicsBody.velocity.y, movement.z * speed);
 
-        // Vérifier si le joueur est au sol
+        animator.SetFloat("walk", moveSpeed);
+
         isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.1f);
         animator.SetBool("isGrounded", isGrounded);
 
-        if (moveDir.magnitude > 0.1f)
+        if (moveSpeed > 0.1f)
         {
-            Quaternion toRotation = Quaternion.LookRotation(moveDir, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed);
         }
     }
 
@@ -99,4 +96,5 @@ public class PlayerMovementPhysic : MonoBehaviour
             animator.SetTrigger("Dash");
         }
     }
+
 }
