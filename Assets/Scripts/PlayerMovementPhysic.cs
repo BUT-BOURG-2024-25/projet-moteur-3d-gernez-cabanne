@@ -10,7 +10,6 @@ public class PlayerMovementPhysic : MonoBehaviour
     [SerializeField]
     private float rotationSpeed = 200f;
     [SerializeField]
-    private float DashPower = 5f;
     private float dashPower = 10f;
     [SerializeField]
     private float dashDuration = 0.2f;
@@ -132,4 +131,3 @@ public class PlayerMovementPhysic : MonoBehaviour
         }
     }
 }
-
