@@ -16,12 +16,12 @@
                 },
                 {
                     "name": "Dash",
-                    "type": "Button",
+                    "type": "Value",
                     "id": "d3147923-8c16-420b-9e24-54814c0801b5",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Click",
