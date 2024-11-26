@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    [SerializeField]
-    private float speed = 2f;
-    [SerializeField]
-    private float rotationSpeed = 1f;
-    [SerializeField]
-    private float deathDelay = 2.5f;
+    [Header("Enemy Settings")]
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float rotationSpeed = 1f;
+    [SerializeField] private float deathDelay = 2.5f;
+
+    [Header("Combat Settings")]
+    [SerializeField] private int health = 1;
+    [SerializeField] private int xpReward = 10;
+
+    [Header("References")]
+    [SerializeField] private BoxCollider attackCollider;
 
     private Vector3 movementDirection;
     private Rigidbody rb;
@@ -18,12 +23,7 @@ public class EnemyMovement : MonoBehaviour
 
     private Transform player;
     private PlayerHealth playerHealth;
-
-    [SerializeField]
-    private BoxCollider attackCollider;
-    
-    [SerializeField]
-    private int health = 1;
+    private PlayerExperience playerExperience;
 
     void Start()
     {
@@ -31,7 +31,11 @@ public class EnemyMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         player = GameObject.FindWithTag("Player").transform;
 
-        playerHealth = player.GetComponent<PlayerHealth>();
+        if (player != null)
+        {
+            playerHealth = player.GetComponent<PlayerHealth>();
+            playerExperience = player.GetComponent<PlayerExperience>();
+        }
 
         if (attackCollider == null)
         {
@@ -88,7 +92,6 @@ public class EnemyMovement : MonoBehaviour
             Die();
         }
     }
-    
 
     public void Die()
     {
@@ -102,9 +105,23 @@ public class EnemyMovement : MonoBehaviour
         animator.SetTrigger("EnemyDeath");
 
         rb.isKinematic = true;
-
         //GameManager.Instance.RemoveEnemyFromList(gameObject);
+
+        // Récompense XP
+        GrantXP();
+
         Destroy(gameObject, deathDelay);
     }
 
+    private void GrantXP()
+    {
+        if (playerExperience != null)
+        {
+            playerExperience.AddXP(xpReward);
+        }
+        else
+        {
+            Debug.LogWarning("Le joueur n'a pas de script PlayerExperience assigné.");
+        }
+    }
 }

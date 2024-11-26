@@ -55,6 +55,7 @@ public class AutoProjectile : MonoBehaviour
                 if (enemyMovement != null)
                 {
                     enemyMovement.TakeDamage(1);
+                    Destroy(gameObject);
 
                     if (enemyHitEffectPrefab != null)
                     {
