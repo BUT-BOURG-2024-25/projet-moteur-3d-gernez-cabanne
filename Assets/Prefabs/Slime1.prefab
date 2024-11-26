@@ -222,8 +222,10 @@ MonoBehaviour:
   speed: 1
   rotationSpeed: 10
   deathDelay: 1
-  attackCollider: {fileID: 8555368373572430374}
   health: 1
+  xpReward: 10
+  attackCollider: {fileID: 8555368373572430374}
+  xpPrefab: {fileID: 4211110631393528203, guid: ca1492b5b95eefb45b3ea27369b7301e, type: 3}
 --- !u!95 &3725620472991168831
 Animator:
   serializedVersion: 5

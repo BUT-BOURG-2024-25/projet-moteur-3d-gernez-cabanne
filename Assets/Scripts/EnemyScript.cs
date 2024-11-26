@@ -15,6 +15,7 @@ public class EnemyMovement : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private BoxCollider attackCollider;
+    [SerializeField] private GameObject xpPrefab;
 
     private Vector3 movementDirection;
     private Rigidbody rb;
@@ -105,23 +106,23 @@ public class EnemyMovement : MonoBehaviour
         animator.SetTrigger("EnemyDeath");
 
         rb.isKinematic = true;
-        //GameManager.Instance.RemoveEnemyFromList(gameObject);
 
-        // Récompense XP
-        GrantXP();
+        // Récompense XP avec animation
+        DropXP();
 
         Destroy(gameObject, deathDelay);
     }
 
-    private void GrantXP()
+    private void DropXP()
     {
-        if (playerExperience != null)
+        if (xpPrefab != null)
         {
-            playerExperience.AddXP(xpReward);
+            Vector3 spawnPosition = transform.position + Vector3.up * 1f;
+            Instantiate(xpPrefab, spawnPosition, Quaternion.identity);
         }
         else
         {
-            Debug.LogWarning("Le joueur n'a pas de script PlayerExperience assigné.");
+            Debug.LogWarning("Le prefab d'XP n'est pas assigné.");
         }
     }
 }
