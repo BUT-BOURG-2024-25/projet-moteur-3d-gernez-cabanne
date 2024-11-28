@@ -5,7 +5,7 @@ public class AutoProjectile : MonoBehaviour
     [SerializeField]
     private float speed = 10f;
     [SerializeField]
-    private float damage = 10f;
+    private int projDamage = 1;
     [SerializeField]
     private float lifetime = 5f;
     [SerializeField]
@@ -54,7 +54,7 @@ public class AutoProjectile : MonoBehaviour
                 EnemyMovement enemyMovement = enemy.GetComponent<EnemyMovement>();
                 if (enemyMovement != null)
                 {
-                    enemyMovement.TakeDamage(1);
+                    enemyMovement.TakeDamage(projDamage);
                     Destroy(gameObject);
 
                     if (enemyHitEffectPrefab != null)

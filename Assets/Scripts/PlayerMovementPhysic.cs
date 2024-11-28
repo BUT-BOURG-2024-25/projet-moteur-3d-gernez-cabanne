@@ -17,9 +17,9 @@ public class PlayerMovementPhysic : MonoBehaviour
     private float dashCooldown = 1f;
 
     [SerializeField]
-    private GameObject smokePrefab; // Le prefab de fumée
+    private GameObject smokePrefab;
     [SerializeField]
-    private Transform smokeSpawnPoint; // Point où la fumée sera créée
+    private Transform smokeSpawnPoint;
 
     private Rigidbody physicsBody;
     private Animator animator;
@@ -96,7 +96,7 @@ public class PlayerMovementPhysic : MonoBehaviour
     {
         if (isDashing || Time.time < lastDashTime + dashCooldown) 
         {
-            Debug.Log("Dash prevented due to conditions");
+            Debug.Log("Dash");
             return;
         }
 
@@ -124,10 +124,6 @@ public class PlayerMovementPhysic : MonoBehaviour
         if (smokePrefab != null && smokeSpawnPoint != null)
         {
             Instantiate(smokePrefab, smokeSpawnPoint.position, Quaternion.identity);
-        }
-        else
-        {
-            Debug.LogWarning("Smoke prefab or spawn point is not assigned.");
         }
     }
 }

@@ -11,7 +11,8 @@ public class EnemyMovement : MonoBehaviour
 
     [Header("Combat Settings")]
     [SerializeField] private int health = 1;
-    [SerializeField] private int xpReward = 10;
+    [SerializeField] private int damageDeal = 1;
+
 
     [Header("References")]
     [SerializeField] private BoxCollider attackCollider;
@@ -77,7 +78,7 @@ public class EnemyMovement : MonoBehaviour
         {
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(1);
+                playerHealth.TakeDamage(damageDeal);
             }
         }
     }
