@@ -5,13 +5,15 @@ public class AutoProjectile : MonoBehaviour
     [SerializeField]
     private float speed = 10f;
     [SerializeField]
-    private int projDamage = 1;
+    public int BaseDamage { get; set; } = 1;
+
     [SerializeField]
     private float lifetime = 5f;
     [SerializeField]
-    private GameObject enemyHitEffectPrefab; 
+    private GameObject enemyHitEffectPrefab;
 
-    private GameObject target;
+    private Vector3 targetDirection;
+    private bool hasDirection = false;
 
     void Start()
     {
@@ -20,49 +22,49 @@ public class AutoProjectile : MonoBehaviour
 
     void Update()
     {
-        if (!target)
+        if (hasDirection)
         {
-            Destroy(gameObject);
-            return;
+            transform.position += targetDirection * (speed * Time.deltaTime);
+            transform.rotation = Quaternion.LookRotation(targetDirection);
         }
-
-        Vector3 direction = (target.transform.position - transform.position).normalized;
-        transform.position += direction * (speed * Time.deltaTime);
-
-        transform.LookAt(target.transform);
     }
 
-    public void SetTarget(GameObject newTarget)
+    public void SetTargetDirection(Vector3 direction)
     {
-        target = newTarget;
+        if (direction.magnitude > 0)
+        {
+            targetDirection = direction.normalized;
+            hasDirection = true;
+        }
+    }
+
+    public void IncreaseDamage(int amount)
+    {
+        BaseDamage += amount; 
+        Debug.Log($"Projectile damage increased: {BaseDamage}");
     }
 
     private void InstantiateEnemyHitEffect(Vector3 enemyPosition)
     {
-        GameObject hitEffect = Instantiate(enemyHitEffectPrefab, enemyPosition, Quaternion.identity);
-        hitEffect.transform.position = new Vector3(hitEffect.transform.position.x, hitEffect.transform.position.y + 0.3f, hitEffect.transform.position.z);
-        Destroy(hitEffect, 0.5f);
+        if (enemyHitEffectPrefab != null)
+        {
+            GameObject hitEffect = Instantiate(enemyHitEffectPrefab, enemyPosition, Quaternion.identity);
+            hitEffect.transform.position = new Vector3(hitEffect.transform.position.x, hitEffect.transform.position.y + 0.3f, hitEffect.transform.position.z);
+            Destroy(hitEffect, 0.5f);
+        }
     }
-    
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (GameManager.Instance != null && GameManager.Instance.activeEnemies.Contains(other.gameObject))
         {
-            GameObject enemy = other.gameObject;
-
-
-                EnemyMovement enemyMovement = enemy.GetComponent<EnemyMovement>();
-                if (enemyMovement != null)
-                {
-                    enemyMovement.TakeDamage(projDamage);
-                    Destroy(gameObject);
-
-                    if (enemyHitEffectPrefab != null)
-                    {
-                        InstantiateEnemyHitEffect(other.transform.position);
-                    }
-                }
-
+            EnemyMovement enemyMovement = other.GetComponent<EnemyMovement>();
+            if (enemyMovement != null)
+            {
+                enemyMovement.TakeDamage(BaseDamage);
+                InstantiateEnemyHitEffect(other.transform.position);
+                Destroy(gameObject);
+            }
         }
     }
 }

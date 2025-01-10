@@ -108,7 +108,6 @@ public class EnemyMovement : MonoBehaviour
 
         rb.isKinematic = true;
 
-        // Récompense XP avec animation
         DropXP();
 
         Destroy(gameObject, deathDelay);

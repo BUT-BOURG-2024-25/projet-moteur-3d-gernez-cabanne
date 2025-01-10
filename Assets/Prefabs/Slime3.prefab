@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6019466914805055866}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bone.003_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6985414362958034506}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bone.003_L_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3909142189219452510}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bone.003_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1764212113867898824}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bone.003_R_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -136,7 +136,7 @@ GameObject:
   m_Component:
   - component: {fileID: 257265813013954178}
   - component: {fileID: 731145293430394464}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: triggerslime3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -192,9 +192,9 @@ GameObject:
   - component: {fileID: 5688613057991505095}
   - component: {fileID: 9216341725498886429}
   - component: {fileID: 4801469236029460388}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Slime3
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -315,7 +315,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8919579856636530574}
   - component: {fileID: 3778937291366250576}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Slime_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -403,7 +403,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4357488103857422531}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,7 +424,7 @@ Transform:
   m_Children:
   - {fileID: 6019466914805055866}
   - {fileID: 3909142189219452510}
-  - {fileID: 986065908757916043}
+  - {fileID: 5869756397756890720}
   m_Father: {fileID: 9028631944494952587}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -437,7 +437,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9028631944494952587}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Rig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -516,12 +516,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: VikingHelmet
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2e6931140dfc0a342b8aaca58929e860, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e6931140dfc0a342b8aaca58929e860, type: 3}
---- !u!4 &986065908757916043 stripped
+--- !u!4 &5869756397756890720 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2e6931140dfc0a342b8aaca58929e860, type: 3}
   m_PrefabInstance: {fileID: 6268774446570232203}
