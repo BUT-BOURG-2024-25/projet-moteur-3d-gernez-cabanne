@@ -22,6 +22,14 @@ public class PlayerExperience : MonoBehaviour
     private int currentXP = 0;
     private int xpToNextLevel;
 
+    // Enum for upgrade types
+    public enum UpgradeType
+    {
+        AddProjectile,
+        IncreaseDamage,
+        IncreaseSpeed
+    }
+
     private void Start()
     {
         xpToNextLevel = baseXP;
@@ -64,7 +72,7 @@ public class PlayerExperience : MonoBehaviour
     {
         levelUpPanel.SetActive(true);
 
-        string[] possibleUpgrades = { "Add Projectile", "Increase Damage", "Increase Speed", "Boost Health", "Gain Shield" };
+        string[] possibleUpgrades = { "Add Projectile", "Increase Damage", "Increase Speed" };
         int[] upgradeIndexes = new int[3];
 
         for (int i = 0; i < upgradeIndexes.Length; i++)
@@ -83,26 +91,30 @@ public class PlayerExperience : MonoBehaviour
         {
             int upgradeIndex = upgradeIndexes[i];
             upgradeButtons[i].onClick.RemoveAllListeners();
-            upgradeButtons[i].onClick.AddListener(() => ApplyUpgrade(upgradeIndex));
+            // Pass the upgrade type to ApplyUpgrade
+            upgradeButtons[i].onClick.AddListener(() => ApplyUpgrade((UpgradeType)upgradeIndex));
         }
     }
 
-    private void ApplyUpgrade(int upgradeIndex)
+    private void ApplyUpgrade(UpgradeType upgradeType)
     {
-        if (levelUpPanel.activeSelf) 
+        if (levelUpPanel.activeSelf)
         {
-            switch (upgradeIndex)
+            switch (upgradeType)
             {
-                case 0: AddProjectileUpgrade(); break;
-                case 1: IncreaseDamage(); break;
-                case 2: IncreaseSpeed(); break;
-                case 3: BoostHealth(); break;
-                case 4: GainShield(); break;
+                case UpgradeType.AddProjectile:
+                    AddProjectileUpgrade();
+                    break;
+                case UpgradeType.IncreaseDamage:
+                    IncreaseDamage();
+                    break;
+                case UpgradeType.IncreaseSpeed:
+                    IncreaseSpeed();
+                    break;
             }
             levelUpPanel.SetActive(false);
         }
     }
-
 
     private void AddProjectileUpgrade()
     {
@@ -113,7 +125,7 @@ public class PlayerExperience : MonoBehaviour
             if (autoProjectile != null)
             {
                 autoProjectile.AddProjectile();
-                Debug.Log("Projectile Upgrade Selected!");
+                Debug.Log("Projectile Upgrade Selected! Projectiles per attack: " + autoProjectile.projectilesPerAttack);
             }
             else
             {
@@ -122,34 +134,21 @@ public class PlayerExperience : MonoBehaviour
         }
     }
 
-
     private void IncreaseDamage()
     {
         AutoProjectile[] projectiles = FindObjectsOfType<AutoProjectile>();
         foreach (AutoProjectile projectile in projectiles)
         {
             projectile.BaseDamage = projectile.BaseDamage + 1;
-            //projectile.IncreaseDamage(1);
+            projectile.IncreaseDamage(1);
         }
         Debug.Log("Damage Increased for all active projectiles!");
     }
 
-
     private void IncreaseSpeed()
     {
-        // Add logic to increase player speed
-        Debug.Log("Speed Increased!");
-    }
+        
+     Debug.Log("Speed Increased!");
 
-    private void BoostHealth()
-    {
-        // Add logic to boost player health
-        Debug.Log("Health Boosted!");
-    }
-
-    private void GainShield()
-    {
-        // Add logic to add a shield or enhance defense
-        Debug.Log("Shield Gained!");
     }
 }

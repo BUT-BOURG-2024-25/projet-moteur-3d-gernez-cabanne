@@ -215,7 +215,7 @@ Transform:
   - {fileID: 8919579856636530574}
   - {fileID: 257265813013954178}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &4073087923492812434
 Rigidbody:
@@ -304,7 +304,7 @@ MonoBehaviour:
   health: 4
   damageDeal: 3
   attackCollider: {fileID: 731145293430394464}
-  xpPrefab: {fileID: 6335618452531546221, guid: 66a1a6ef0fce2de479926b2e200b4429, type: 3}
+  xpPrefab: {fileID: 205698079329069120, guid: 4b28e13bd050e494b8273dc18f36bad4, type: 3}
 --- !u!1 &6820869216676218454
 GameObject:
   m_ObjectHideFlags: 0

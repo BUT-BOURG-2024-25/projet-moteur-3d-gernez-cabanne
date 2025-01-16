@@ -9,7 +9,7 @@ public class PlayerAutoAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 1f;
     [SerializeField] private Transform projectileSpawnPoint;
     [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private int projectilesPerAttack = 3;
+    [SerializeField] public int projectilesPerAttack = 1;
     [SerializeField] private float spreadAngle = 45f;
 
     private Animator animator;
@@ -30,11 +30,12 @@ public class PlayerAutoAttack : MonoBehaviour
             }
         }
     }
-
     public void AddProjectile()
     {
         projectilesPerAttack++;
+        Debug.Log($"Projectiles Per Attack: {projectilesPerAttack}");
     }
+
 
     private GameObject FindClosestEnemy()
     {
@@ -77,14 +78,13 @@ public class PlayerAutoAttack : MonoBehaviour
             for (int i = 0; i < projectilesPerAttack; i++)
             {
                 float currentAngle = angleOffset + i * angleStep;
-
                 Quaternion rotation = Quaternion.Euler(0, currentAngle, 0);
                 Vector3 direction = rotation * (target.transform.position - transform.position).normalized;
-
                 FireProjectile(direction);
             }
         }
     }
+
 
     private void FireProjectile(Vector3 direction)
     {

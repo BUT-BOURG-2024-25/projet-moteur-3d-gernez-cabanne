@@ -1,20 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
     [Header("Spawn Settings")]
     [SerializeField] private List<GameObject> enemyPrefabs;
     [SerializeField] private Transform player;
-    [SerializeField] private float spawnInterval = 3f;
+    [SerializeField] private float initialSpawnInterval = 3f;
     [SerializeField] private int maxEnemies = 50;
     [SerializeField] private List<float> spawnRates;
     [SerializeField] private float spawnRadius = 10f;
     [SerializeField] private float minSpawnDistance = 3f;
 
+    [Header("Wave Settings")]
+    [SerializeField] private Text waveText;
+    [SerializeField] private Text killCounterText;
+    [SerializeField] private float waveDuration = 10f;
+
     public List<GameObject> activeEnemies = new List<GameObject>();
     private float spawnTimer = 0f;
+    private float waveTimer = 0f;
+    private float currentSpawnInterval;
     private float totalSpawnRate;
+
+    private int currentWave = 1;
+    private int killCount = 0;
 
     protected override void Awake()
     {
@@ -32,18 +43,50 @@ public class GameManager : Singleton<GameManager>
         {
             totalSpawnRate += rate;
         }
-    }
 
+        currentSpawnInterval = initialSpawnInterval;
+        UpdateUI();
+    }
 
     void Update()
     {
+        waveTimer += Time.deltaTime;
         spawnTimer += Time.deltaTime;
 
-        if (spawnTimer >= spawnInterval && activeEnemies.Count < maxEnemies)
+        CleanUpDeadEnemies();
+
+        if (waveTimer >= waveDuration)
+        {
+            StartNextWave();
+        }
+
+        if (spawnTimer >= currentSpawnInterval && activeEnemies.Count < maxEnemies)
         {
             SpawnEnemy();
             spawnTimer = 0f;
         }
+    }
+
+    private void CleanUpDeadEnemies()
+    {
+        for (int i = activeEnemies.Count - 1; i >= 0; i--)
+        {
+            if (activeEnemies[i] == null)
+            {
+                activeEnemies.RemoveAt(i);
+                killCount++;
+                UpdateUI();
+            }
+        }
+    }
+
+
+    private void StartNextWave()
+    {
+        waveTimer = 0f;
+        currentWave++;
+        currentSpawnInterval *= 0.9f;
+        UpdateUI();
     }
 
     private void SpawnEnemy()
@@ -87,12 +130,14 @@ public class GameManager : Singleton<GameManager>
         return enemyPrefabs[0];
     }
 
-    private void RemoveEnemy(GameObject enemy)
+    public void EnemyKilled(GameObject enemy)
     {
         if (activeEnemies.Contains(enemy))
         {
             activeEnemies.Remove(enemy);
             Destroy(enemy);
+            killCount++;
+            UpdateUI();
         }
     }
 
@@ -103,5 +148,18 @@ public class GameManager : Singleton<GameManager>
             if (enemy != null) Destroy(enemy);
         }
         activeEnemies.Clear();
+    }
+
+    private void UpdateUI()
+    {
+        if (waveText != null)
+        {
+            waveText.text = "Wave: " + currentWave;
+        }
+
+        if (killCounterText != null)
+        {
+            killCounterText.text = "Kills: " + killCount;
+        }
     }
 }
