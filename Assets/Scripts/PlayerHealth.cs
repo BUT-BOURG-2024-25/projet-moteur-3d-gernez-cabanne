@@ -8,7 +8,6 @@ public class PlayerHealth : MonoBehaviour
 
     public HealthUI healthUI;
     private Animator animator;
-    public GameObject gameOverScreen;
 
     private bool isInvincible = false;
     public float invincibilityDuration = 2f;
@@ -23,10 +22,6 @@ public class PlayerHealth : MonoBehaviour
             healthUI.UpdateHealthUI(currentHealth, maxHealth);
         }
 
-        if (gameOverScreen != null)
-        {
-            gameOverScreen.SetActive(false);
-        }
     }
 
     public void TakeDamage(int damage)
@@ -66,33 +61,25 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
-        if (animator != null)
+        GameOverManager gameOverManager = FindObjectOfType<GameOverManager>();
+        if (gameOverManager != null)
         {
-            animator.SetBool("Die", true);
+            gameOverManager.TriggerGameOver();
         }
 
-        if (gameOverScreen != null)
-        {
-            gameOverScreen.SetActive(true);
-        }
-
-        StartCoroutine(Respawn());
     }
 
-    private IEnumerator Respawn()
+    public void IncreaseMaxHealth(int amount)
     {
-        yield return new WaitForSeconds(1f);
+        maxHealth += amount;
+        currentHealth = maxHealth;
 
-        animator.SetBool("Die", false);
-        if (gameOverScreen != null)
+        if (healthUI != null)
         {
-            gameOverScreen.SetActive(false);
+            healthUI.UpdateHealthUI(currentHealth, maxHealth);
         }
 
-        currentHealth = maxHealth;
-        healthUI.UpdateHealthUI(currentHealth, maxHealth);
-
-        //GameManager.Instance.GameOver();
+        Debug.Log($"Max health increased by {amount}. New max health: {maxHealth}");
     }
 
     private IEnumerator InvincibilityCoroutine()

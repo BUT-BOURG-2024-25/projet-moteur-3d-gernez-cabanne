@@ -30,7 +30,7 @@ public class GameManager : Singleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         if (enemyPrefabs.Count != spawnRates.Count)
         {
@@ -85,7 +85,7 @@ public class GameManager : Singleton<GameManager>
     {
         waveTimer = 0f;
         currentWave++;
-        currentSpawnInterval *= 0.9f;
+        currentSpawnInterval *= 0.75f;
         UpdateUI();
     }
 
@@ -100,18 +100,24 @@ public class GameManager : Singleton<GameManager>
 
     private Vector3 GetRandomSpawnPositionAroundPlayer()
     {
-        Vector3 spawnPosition;
-        do
+        if (player != null)
         {
-            float angle = Random.Range(0f, 360f);
-            float distance = Random.Range(minSpawnDistance, spawnRadius);
-            Vector3 offset = new Vector3(Mathf.Cos(angle) * distance, 0, Mathf.Sin(angle) * distance);
-            spawnPosition = player.position + offset;
-        }
-        while (Vector3.Distance(spawnPosition, player.position) < minSpawnDistance);
+            Vector3 spawnPosition;
+            do
+            {
+                float angle = Random.Range(0f, 360f);
+                float distance = Random.Range(minSpawnDistance, spawnRadius);
+                Vector3 offset = new Vector3(Mathf.Cos(angle) * distance, 0, Mathf.Sin(angle) * distance);
+                spawnPosition = player.position + offset;
+            }
+            while (Vector3.Distance(spawnPosition, player.position) < minSpawnDistance);
 
-        return spawnPosition;
+            return spawnPosition;
+        }
+
+        return Vector3.zero;
     }
+
 
     private GameObject GetRandomEnemyPrefab()
     {
@@ -162,4 +168,19 @@ public class GameManager : Singleton<GameManager>
             killCounterText.text = "Kills: " + killCount;
         }
     }
+
+    public void ResetGame()
+    {
+        currentWave = 1;
+        killCount = 0;
+
+        spawnTimer = 0f;
+        waveTimer = 0f;
+        currentSpawnInterval = initialSpawnInterval;
+
+        RemoveAllEnemies();
+
+        UpdateUI();
+    }
+
 }

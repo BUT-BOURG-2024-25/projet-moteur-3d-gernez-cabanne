@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 public class PlayerExperience : MonoBehaviour
 {
@@ -14,27 +15,37 @@ public class PlayerExperience : MonoBehaviour
     [SerializeField] private float xpIncreaseFactor = 1.5f;
 
     [Header("Level Up UI")]
-    [SerializeField] private GameObject levelUpPanel; // Panel that will show the options
-    [SerializeField] private Button[] upgradeButtons; // Array of buttons for upgrades
-    [SerializeField] private TMP_Text[] buttonTexts; // Array of text components for buttons
+    [SerializeField] private GameObject levelUpPanel;
+    [SerializeField] private Button[] upgradeButtons;
+    [SerializeField] private TMP_Text[] buttonTexts;
 
     private int currentLevel = 1;
     private int currentXP = 0;
     private int xpToNextLevel;
 
-    // Enum for upgrade types
     public enum UpgradeType
     {
         AddProjectile,
         IncreaseDamage,
-        IncreaseSpeed
+        IncreaseHealth,
+        Explo,
+        Gosth
     }
+
+    private Dictionary<UpgradeType, string> upgradeDescriptions = new Dictionary<UpgradeType, string>
+    {
+        { UpgradeType.AddProjectile, "More projectile" },
+        { UpgradeType.IncreaseDamage, "Increase damage" },
+        { UpgradeType.IncreaseHealth, "Increase health" },
+        { UpgradeType.Gosth, "Add Ghost Shield" },
+        { UpgradeType.Explo, "Better Explosion" }
+    };
 
     private void Start()
     {
         xpToNextLevel = baseXP;
         UpdateUI();
-        levelUpPanel.SetActive(false); // Hide the level up panel initially
+        levelUpPanel.SetActive(false);
     }
 
     public void AddXP(int amount)
@@ -56,7 +67,7 @@ public class PlayerExperience : MonoBehaviour
         xpToNextLevel = Mathf.CeilToInt(xpToNextLevel * xpIncreaseFactor);
 
         Debug.Log($"Level Up! New Level: {currentLevel}");
-        GrantReward(currentLevel);
+        ShowLevelUpOptions();
     }
 
     private void UpdateUI()
@@ -68,52 +79,62 @@ public class PlayerExperience : MonoBehaviour
         levelText.text = $"Level {currentLevel}";
     }
 
-    private void GrantReward(int level)
+    private void ShowLevelUpOptions()
     {
+        Time.timeScale = 0f;
+
         levelUpPanel.SetActive(true);
 
-        string[] possibleUpgrades = { "Add Projectile", "Increase Damage", "Increase Speed" };
-        int[] upgradeIndexes = new int[3];
+        List<UpgradeType> upgradePool = new List<UpgradeType>((UpgradeType[])System.Enum.GetValues(typeof(UpgradeType)));
+        List<UpgradeType> selectedUpgrades = new List<UpgradeType>();
 
-        for (int i = 0; i < upgradeIndexes.Length; i++)
+        while (selectedUpgrades.Count < 3 && upgradePool.Count > 0)
         {
-            int randomIndex;
-            do
-            {
-                randomIndex = Random.Range(0, possibleUpgrades.Length);
-            } while (System.Array.Exists(upgradeIndexes, element => element == randomIndex));
-
-            upgradeIndexes[i] = randomIndex;
-            buttonTexts[i].text = possibleUpgrades[randomIndex];
+            int index = Random.Range(0, upgradePool.Count);
+            selectedUpgrades.Add(upgradePool[index]);
+            upgradePool.RemoveAt(index);
         }
 
         for (int i = 0; i < upgradeButtons.Length; i++)
         {
-            int upgradeIndex = upgradeIndexes[i];
-            upgradeButtons[i].onClick.RemoveAllListeners();
-            // Pass the upgrade type to ApplyUpgrade
-            upgradeButtons[i].onClick.AddListener(() => ApplyUpgrade((UpgradeType)upgradeIndex));
+            if (i < selectedUpgrades.Count)
+            {
+                UpgradeType upgrade = selectedUpgrades[i];
+                buttonTexts[i].text = upgradeDescriptions[upgrade];
+                upgradeButtons[i].onClick.RemoveAllListeners();
+                upgradeButtons[i].onClick.AddListener(() => SelectUpgrade(upgrade));
+                upgradeButtons[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                upgradeButtons[i].gameObject.SetActive(false);
+            }
         }
     }
 
-    private void ApplyUpgrade(UpgradeType upgradeType)
+    private void SelectUpgrade(UpgradeType upgrade)
     {
-        if (levelUpPanel.activeSelf)
+        switch (upgrade)
         {
-            switch (upgradeType)
-            {
-                case UpgradeType.AddProjectile:
-                    AddProjectileUpgrade();
-                    break;
-                case UpgradeType.IncreaseDamage:
-                    IncreaseDamage();
-                    break;
-                case UpgradeType.IncreaseSpeed:
-                    IncreaseSpeed();
-                    break;
-            }
-            levelUpPanel.SetActive(false);
+            case UpgradeType.AddProjectile:
+                AddProjectileUpgrade();
+                break;
+            case UpgradeType.IncreaseDamage:
+                IncreaseDamage();
+                break;
+            case UpgradeType.IncreaseHealth:
+                IncreaseHealth();
+                break;
+            case UpgradeType.Gosth:
+                Gosth();
+                break;
+            case UpgradeType.Explo:
+                Explo();
+                break;
         }
+
+        levelUpPanel.SetActive(false);
+        Time.timeScale = 1f;
     }
 
     private void AddProjectileUpgrade()
@@ -125,30 +146,72 @@ public class PlayerExperience : MonoBehaviour
             if (autoProjectile != null)
             {
                 autoProjectile.AddProjectile();
-                Debug.Log("Projectile Upgrade Selected! Projectiles per attack: " + autoProjectile.projectilesPerAttack);
-            }
-            else
-            {
-                Debug.LogWarning("AutoProjectile component not found on Player!");
             }
         }
     }
 
     private void IncreaseDamage()
     {
-        AutoProjectile[] projectiles = FindObjectsOfType<AutoProjectile>();
-        foreach (AutoProjectile projectile in projectiles)
-        {
-            projectile.BaseDamage = projectile.BaseDamage + 1;
-            projectile.IncreaseDamage(1);
-        }
-        Debug.Log("Damage Increased for all active projectiles!");
+        AutoProjectile.GlobalDamageBonus += 1;
+        Debug.Log("Damage increased!");
     }
 
-    private void IncreaseSpeed()
+    private void IncreaseHealth()
     {
-        
-     Debug.Log("Speed Increased!");
-
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.IncreaseMaxHealth(1);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerHealth component not found on Player!");
+            }
+        }
     }
+
+    private void Explo()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            ExplosionAbility explosionAbility = player.GetComponent<ExplosionAbility>();
+            if (explosionAbility != null)
+            {
+                if (!explosionAbility.IsActive())
+                {
+                    explosionAbility.ActivateExplosion();
+                    Debug.Log("Explosion ability activated!");
+                }
+                else
+                {
+                    explosionAbility.IncreaseExplosionDamageRadius(1);
+                    Debug.Log("Explosion damage increased!");
+                }
+            }
+        }
+    }
+
+
+    private void Gosth()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player != null)
+        {
+            OrbitalsManager orbitalsManager = player.GetComponent<OrbitalsManager>();
+            if (orbitalsManager != null)
+            {
+                orbitalsManager.AddOrbital();
+                Debug.Log("Orbital added!");
+            }
+            else
+            {
+                Debug.LogWarning("OrbitalsManager component not found on Player!");
+            }
+        }
+    }
+
 }

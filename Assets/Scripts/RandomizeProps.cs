@@ -9,6 +9,16 @@ public class RandomizeProps : MonoBehaviour
 
     void Start()
     {
+        if (propSpawnPoints == null || propSpawnPoints.Count == 0)
+        {
+            return;
+        }
+
+        if (propPrefabs == null || propPrefabs.Count == 0)
+        {
+            return;
+        }
+
         SpawnProps();
     }
 

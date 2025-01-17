@@ -4,8 +4,9 @@ public class AutoProjectile : MonoBehaviour
 {
     [SerializeField]
     private float speed = 10f;
-    [SerializeField]
-    public int BaseDamage { get; set; } = 1;
+
+    public int BaseDamage = 1;
+    public static int GlobalDamageBonus = 0;
 
     [SerializeField]
     private float lifetime = 5f;
@@ -40,7 +41,7 @@ public class AutoProjectile : MonoBehaviour
 
     public void IncreaseDamage(int amount)
     {
-        BaseDamage += amount; 
+        GlobalDamageBonus += amount; 
         Debug.Log($"Projectile damage increased: {BaseDamage}");
     }
 
@@ -61,7 +62,7 @@ public class AutoProjectile : MonoBehaviour
             EnemyMovement enemyMovement = other.GetComponent<EnemyMovement>();
             if (enemyMovement != null)
             {
-                enemyMovement.TakeDamage(BaseDamage);
+                enemyMovement.TakeDamage(BaseDamage + GlobalDamageBonus);
                 InstantiateEnemyHitEffect(other.transform.position);
                 Destroy(gameObject);
             }

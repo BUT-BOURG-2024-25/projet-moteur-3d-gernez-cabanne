@@ -7,7 +7,7 @@ public class ExplosionAbility : MonoBehaviour
     [SerializeField] private float explosionRadius = 5f;
     [SerializeField] private int explosionDamage = 4;
     [SerializeField] private float cooldownTime = 5f;
-    [SerializeField] private bool active = false;
+    private bool active = false;
 
     [Header("Layer Settings")]
     [SerializeField] private LayerMask enemyLayer;
@@ -16,7 +16,7 @@ public class ExplosionAbility : MonoBehaviour
 
     void Update()
     {
-        if(!active){return;};
+        if (!active) { return; }
 
         cooldownTimer += Time.deltaTime;
         if (cooldownTimer >= cooldownTime)
@@ -47,6 +47,26 @@ public class ExplosionAbility : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void ActivateExplosion()
+    {
+        active = true;
+        Debug.Log("Explosion activated!");
+    }
+
+    public bool IsActive()
+    {
+        return active;
+    }
+
+
+    public void IncreaseExplosionDamageRadius(int amount)
+    {
+        explosionDamage += amount;
+        explosionRadius += amount;
+
+        Debug.Log($"Explosion damage increased to {explosionDamage}!");
     }
 
     private void OnDrawGizmosSelected()
